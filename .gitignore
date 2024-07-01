@@ -1,0 +1,15 @@
+# Ignore the outputs folder
+outputs/
+
+#ignore raw datasets
+datasets/raw_datasets/
+
+datasets/SUMM/
+
+datasets/dataset_stats.txt
+
+#ignore raptor trees
+/rag/raptor/trees/
+
+#ignore eval
+eval/
