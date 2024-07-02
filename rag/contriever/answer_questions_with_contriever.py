@@ -45,20 +45,6 @@ def retrieve_relevant_chunks_contriever(context, question, num_chunks=5):
 async def main():
     folder_path = '../../datasets/filtered_QA'
     dataset_files = [
-        'coursera.jsonl',
-        '2wikimultihopqa.jsonl',
-        'hotpotqa.jsonl',
-        'multifieldqa.jsonl',
-        'naturalquestion.jsonl',
-        'narrativeqa.jsonl',
-        'multidoc2dial.jsonl',
-        'qasper.jsonl',
-        'quality.jsonl',
-        'toeflqa.jsonl',
-        'musique.jsonl',
-        'novelqa.jsonl'
-    ]
-    dataset_files = [
         'naturalquestion.jsonl',
         '2wikimultihopqa.jsonl',
         'hotpotqa.jsonl',
