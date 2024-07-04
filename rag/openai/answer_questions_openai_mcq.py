@@ -6,6 +6,7 @@ import jsonlines
 from tqdm import tqdm
 import openai
 import numpy as np
+import re
 
 api_key = "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"
 model_name = "gpt-4o-2024-05-13"
@@ -32,11 +33,36 @@ def get_embedding(text, model="text-embedding-3-small"):
     embedding = response['data'][0]['embedding']
     return embedding
 
+
 def get_cosine_similarity(vec1, vec2):
     return np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
 
-def retrieve_relevant_chunks_for_question(context, questions, num_chunks=5):
-    context_embeddings = [get_embedding(doc) for doc in context]
+
+def chunk_text(context, chunk_size):
+    sentences = re.split(r'(?<=[.!?]) +', context)
+    
+    chunks = []
+    current_chunk = []
+    current_length = 0
+
+    for sentence in sentences:
+        sentence_length = len(sentence.split())
+        if current_length + sentence_length <= chunk_size:
+            current_chunk.append(sentence)
+            current_length += sentence_length
+        else:
+            chunks.append(' '.join(current_chunk))
+            current_chunk = [sentence]
+            current_length = sentence_length
+
+    if current_chunk:
+        chunks.append(' '.join(current_chunk))
+
+    return chunks
+
+
+def retrieve_relevant_chunks_for_question(context, questions, chunk_size, num_chunks):
+    context_embeddings = [get_embedding(doc) for doc in chunk_text(context, chunk_size=chunk_size)]
     question_embeddings = [get_embedding(question) for question in questions]
     
     relevant_chunks = []
@@ -71,7 +97,7 @@ async def main():
 
                 predictions = []
                 for question in questions:
-                    chunks = retrieve_relevant_chunks_for_question(context, question)
+                    chunks = retrieve_relevant_chunks_for_question(context, question, chunk_size=300, num_chunks=5)
                     combined_chunks = " ".join(chunks)
                     
                     q = "From the context: " + combined_chunks + ", answer the question with the letters of the correct options (e.g., A, B, C, or D) without including text. " + question

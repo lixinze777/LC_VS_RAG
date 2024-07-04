@@ -6,6 +6,7 @@ import jsonlines
 from tqdm import tqdm
 from transformers import AutoTokenizer, AutoModel
 import torch
+import re
 
 # Initialization of the Contriever model
 model_name_contriever = "facebook/contriever"
@@ -32,8 +33,31 @@ async def fetch_response(session, api_key, messages):
         response_data = await response.json()
         return response_data
 
-def retrieve_relevant_chunks_contriever(context, question, num_chunks=5):
-    context_embeddings = [model(**tokenizer(doc, return_tensors='pt'))['last_hidden_state'].mean(dim=1) for doc in context]
+def chunk_text(context, chunk_size):
+    sentences = re.split(r'(?<=[.!?]) +', context)
+    
+    chunks = []
+    current_chunk = []
+    current_length = 0
+
+    for sentence in sentences:
+        sentence_length = len(sentence.split())
+        if current_length + sentence_length <= chunk_size:
+            current_chunk.append(sentence)
+            current_length += sentence_length
+        else:
+            chunks.append(' '.join(current_chunk))
+            current_chunk = [sentence]
+            current_length = sentence_length
+
+    if current_chunk:
+        chunks.append(' '.join(current_chunk))
+
+    return chunks
+
+
+def retrieve_relevant_chunks_contriever(context, question, chunk_size, num_chunks):
+    context_embeddings = [model(**tokenizer(doc, return_tensors='pt'))['last_hidden_state'].mean(dim=1) for doc in chunk_text(context, chunk_size)]
     question_embedding = model(**tokenizer(question, return_tensors='pt'))['last_hidden_state'].mean(dim=1)
     
     scores = [torch.nn.functional.cosine_similarity(question_embedding, context_embedding).item() for context_embedding in context_embeddings]
@@ -42,22 +66,9 @@ def retrieve_relevant_chunks_contriever(context, question, num_chunks=5):
     
     return relevant_chunks
 
+
 async def main():
     folder_path = '../../datasets/filtered_QA'
-    dataset_files = [
-        'coursera.jsonl',
-        '2wikimultihopqa.jsonl',
-        'hotpotqa.jsonl',
-        'multifieldqa.jsonl',
-        'naturalquestion.jsonl',
-        'narrativeqa.jsonl',
-        'multidoc2dial.jsonl',
-        'qasper.jsonl',
-        'quality.jsonl',
-        'toeflqa.jsonl',
-        'musique.jsonl',
-        'novelqa.jsonl'
-    ]
     dataset_files = [
         'naturalquestion.jsonl',
         '2wikimultihopqa.jsonl',
@@ -84,7 +95,7 @@ async def main():
                 predictions = []
                 for question in questions:
                     # Retrieve relevant chunks for each question using Contriever
-                    chunks = retrieve_relevant_chunks_contriever(context, question)
+                    chunks = retrieve_relevant_chunks_contriever(context, question, chunk_size=300, num_chunks=5)
                     combined_chunks = " ".join(chunks)
                     
                     q = "From the context: " + combined_chunks + ", answer the question briefly with no explanation. " + question
