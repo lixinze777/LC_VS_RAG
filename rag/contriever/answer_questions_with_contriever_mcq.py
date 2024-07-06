@@ -56,8 +56,8 @@ def chunk_text(context, chunk_size):
     return chunks
 
 def retrieve_relevant_chunks_contriever(context, question, chunk_size, num_chunks):
-    context_embeddings = [model(**tokenizer(doc, return_tensors='pt'))['last_hidden_state'].mean(dim=1) for doc in chunk_text(context, chunk_size)]
-    question_embedding = model(**tokenizer(question, return_tensors='pt'))['last_hidden_state'].mean(dim=1)
+    context_embeddings = [model(**tokenizer(doc, truncation=True, max_length=512, return_tensors='pt'))['last_hidden_state'].mean(dim=1) for doc in chunk_text(context, chunk_size)]
+    question_embedding = model(**tokenizer(question, truncation=True, max_length=512, return_tensors='pt'))['last_hidden_state'].mean(dim=1)
     
     scores = [torch.nn.functional.cosine_similarity(question_embedding, context_embedding).item() for context_embedding in context_embeddings]
     top_indices = sorted(range(len(scores)), key=lambda i: scores[i], reverse=True)[:num_chunks]
