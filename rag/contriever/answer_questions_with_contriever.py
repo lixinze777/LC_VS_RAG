@@ -52,7 +52,7 @@ def retrieve_relevant_chunks_contriever(context, question, chunk_size, num_chunk
 
 
 def main():
-    folder_path = '../../datasets/filtered_QA'
+    folder_path = './datasets/filtered_QA'
     dataset_files = [
         'naturalquestion.jsonl',
         '2wikimultihopqa.jsonl',
@@ -62,10 +62,6 @@ def main():
         'multidoc2dial.jsonl',
         'qasper.jsonl',
         'musique.jsonl',
-    ]
-
-    dataset_files = [
-        'sample.jsonl',
     ]
 
     for file in dataset_files:
@@ -107,7 +103,7 @@ def main():
             }
             output_list.append(output_item)
 
-        output_file = '../../outputs/contriever/gpt-4o/' + file
+        output_file = './outputs/contriever/gpt-4o/' + file
         os.makedirs(os.path.dirname(output_file), exist_ok=True)
         with jsonlines.open(output_file, mode='w') as writer:
             writer.write_all(output_list)
