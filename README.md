@@ -1,1 +1,1 @@
-# Long_VS_RAG
+# Long Context vs. RAG for LLMs: An Evaluation and Revisits
