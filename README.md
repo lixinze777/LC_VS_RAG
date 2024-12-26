@@ -1,6 +1,15 @@
 # Long Context vs. RAG for LLMs: An Evaluation and Revisits
 
-# Dataset
+## Preparation
+
+### Environment
+To run our code, please install all the dependency packages by using the following command:
+
+```
+pip install -r requirements.txt
+```
+
+### Dataset
 Download Dataset from the link：
 [Download Dataset](https://entuedu-my.sharepoint.com/:f:/g/personal/xinze002_e_ntu_edu_sg/Elj-wpX68UpLvMMuvGmTn_UBDeepoSYfKEtukRUhGWJ5kw?e=sBQWeD)
 
