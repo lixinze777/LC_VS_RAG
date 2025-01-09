@@ -4,8 +4,6 @@ Extending context windows (i.e., Long Context, LC) and using retrievers to selec
 ## Paper Link
 [Download Paper](https://arxiv.org/pdf/2501.01880)
 
-## Graph
-
 ## Preparation
 ### Environment
 To run our code, please install all the dependency packages by using the following command:
@@ -40,6 +38,7 @@ Datasets
   │   ├── 2wikimultihop.jsonl
   │   ├── coursera.jsonl
   │   └── (more datasets ... )
+```
 
 ## Citation
 Please cite our paper if you find it helpful to your work:
@@ -53,3 +52,4 @@ Please cite our paper if you find it helpful to your work:
       primaryClass={cs.CL},
       url={https://arxiv.org/abs/2501.01880}, 
 }
+```
